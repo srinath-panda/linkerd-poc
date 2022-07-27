@@ -1,5 +1,7 @@
 
 # prometheus configuration
 prometheusUrl: "http://prometheus-server.utils.svc.cluster.local:80"
+grafana:
+  enabled: false
 prometheus:
   enabled: false
