@@ -1,0 +1,5 @@
+
+# prometheus configuration
+prometheusUrl: "http://prometheus-server.utils.svc.cluster.local:80"
+prometheus:
+  enabled: false

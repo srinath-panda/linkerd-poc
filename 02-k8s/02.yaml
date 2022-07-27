@@ -1,0 +1,35 @@
+#trust anchor issuer. 
+#the secret `linkerd-trust-anchor-cert` is created by the CSI driver, contains the root CA crt and key
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: linkerd-trust-anchor-issuer
+  namespace: cert-manager
+spec:
+  ca:
+    secretName: linkerd-identity-trust-roots
+---
+#intermediate certificate signed by l5d root CA aka (trust-anchor) which is in vault (self signed)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-identity-issuer
+  namespace: linkerd
+spec:
+  secretName: linkerd-identity-issuer
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  issuerRef:
+    name: linkerd-trust-anchor-issuer
+    kind: ClusterIssuer
+  commonName: identity.linkerd.cluster.local
+  dnsNames:
+  - identity.linkerd.cluster.local
+  isCA: true
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - cert sign
+  - crl sign
+  - server auth
+  - client auth

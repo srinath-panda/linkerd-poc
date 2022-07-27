@@ -1,0 +1,63 @@
+apiVersion: v1
+data:
+  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJpekNDQVRHZ0F3SUJBZ0lSQUw4T1N2QTdJVG55ZzlENlFIU1pXVVl3Q2dZSUtvWkl6ajBFQXdJd0pURWoKTUNFR0ExVUVBeE1hY205dmRDNXNhVzVyWlhKa0xtTnNkWE4wWlhJdWJHOWpZV3d3SGhjTk1qSXdOekl6TVRnegpPVEU1V2hjTk1qSXhNREl4TVRnek9URTVXakFsTVNNd0lRWURWUVFERXhweWIyOTBMbXhwYm10bGNtUXVZMngxCmMzUmxjaTVzYjJOaGJEQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJKeGNQbTdzZGFMS2xOaXAKZ3kzcFFybm02VDlmT1ZBY2RFWFd0bTNhM09rMTNiTUZaTEczYlZ2WEtQOGZUbkxXZHp3SUQ5NW9Ud2RkRUlCTQpWQlViZW51alFqQkFNQTRHQTFVZER3RUIvd1FFQXdJQ3BEQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01CMEdBMVVkCkRnUVdCQlFhUHhzclJSSUx5RXJWdHRwT3V2cjNoYU9yVmpBS0JnZ3Foa2pPUFFRREFnTklBREJGQWlFQTV0bXEKaGtIeVVxdWZ6UVpwUjI2NTQ2RjBaU1o4QU50bUpEZWI5ZUg2MXYwQ0lDQ3d6eGhVYjM4Z05IdENmV3JIUSs1ZwpJOFdMaXpkK3pTeWZseHZLKzVSdAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJpekNDQVRHZ0F3SUJBZ0lSQUw4T1N2QTdJVG55ZzlENlFIU1pXVVl3Q2dZSUtvWkl6ajBFQXdJd0pURWoKTUNFR0ExVUVBeE1hY205dmRDNXNhVzVyWlhKa0xtTnNkWE4wWlhJdWJHOWpZV3d3SGhjTk1qSXdOekl6TVRnegpPVEU1V2hjTk1qSXhNREl4TVRnek9URTVXakFsTVNNd0lRWURWUVFERXhweWIyOTBMbXhwYm10bGNtUXVZMngxCmMzUmxjaTVzYjJOaGJEQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJKeGNQbTdzZGFMS2xOaXAKZ3kzcFFybm02VDlmT1ZBY2RFWFd0bTNhM09rMTNiTUZaTEczYlZ2WEtQOGZUbkxXZHp3SUQ5NW9Ud2RkRUlCTQpWQlViZW51alFqQkFNQTRHQTFVZER3RUIvd1FFQXdJQ3BEQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01CMEdBMVVkCkRnUVdCQlFhUHhzclJSSUx5RXJWdHRwT3V2cjNoYU9yVmpBS0JnZ3Foa2pPUFFRREFnTklBREJGQWlFQTV0bXEKaGtIeVVxdWZ6UVpwUjI2NTQ2RjBaU1o4QU50bUpEZWI5ZUg2MXYwQ0lDQ3d6eGhVYjM4Z05IdENmV3JIUSs1ZwpJOFdMaXpkK3pTeWZseHZLKzVSdAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUtGYWxkOWtMZjRhbHBuN25lUHBYQWhKS3FtVENKdWFjSVhtNHJwdDV4RUlvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFbkZ3K2J1eDFvc3FVMkttRExlbEN1ZWJwUDE4NVVCeDBSZGEyYmRyYzZUWGRzd1Zrc2JkdApXOWNvL3g5T2N0WjNQQWdQM21oUEIxMFFnRXhVRlJ0NmV3PT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  name: linkerd-identity-trust-roots
+  namespace: cert-manager
+type: kubernetes.io/tls
+---
+
+#trust anchor issuer. 
+#the secret `linkerd-trust-anchor-cert` is created by the CSI driver, contains the root CA crt and key
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: linkerd-trust-anchor-issuer
+  namespace: cert-manager
+spec:
+  ca:
+    secretName: linkerd-identity-trust-roots
+---
+#intermediate certificate signed by l5d root CA aka (trust-anchor) which is in vault (self signed)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-identity-issuer
+  namespace: linkerd
+spec:
+  secretName: linkerd-identity-issuer
+  duration: 48h
+  renewBefore: 25h
+  issuerRef:
+    name: linkerd-trust-anchor-issuer
+    kind: ClusterIssuer
+  commonName: identity.linkerd.cluster.local
+  dnsNames:
+  - identity.linkerd.cluster.local
+  isCA: true
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - cert sign
+  - crl sign
+  - server auth
+  - client auth
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: linkerd-identity-trust-roots # this is the CM name that linkerd expects (see identity.yaml in l5d helm chart)
+spec:
+  sources:
+  - secret:
+      name: "linkerd-identity-trust-roots"
+      key: "ca.crt"
+  target:
+    configMap:
+      key: "ca-bundle.crt" # this is the CM name that linkerd expects (see identity.yaml in l5d helm chart)
+    # namespaceSelector: ## this doesnt work need to check
+    #   matchLabels:
+    #     kubernetes.io/metadata.name: linkerd
