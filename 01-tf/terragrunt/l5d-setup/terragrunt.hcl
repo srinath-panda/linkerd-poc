@@ -6,31 +6,22 @@ dependencies {
   paths = ["../data"]
 }
 
-include {
-  path = find_in_parent_folders()
+locals {
+  envInfo = yamldecode(file(find_in_parent_folders("env.yaml")))
+  ns = "kube-system"
 }
+
 
 # # Generate a provider for each k8s clusters
 generate "providers" {
   path      = "providers.tf"
   if_exists = "overwrite"
   contents = templatefile("../provider.tmpl", {
-   aws = {
-      profile = "pd-testing"
-      region  = "eu-west-1"
-    }
-    vault = {
-      address = ""
-      token = ""
-    }
+   aws = local.envInfo.aws
+    vault = local.envInfo.vault
     metacluster_info = dependency.data.outputs.metacluster_info
   })
 }
-
-locals {
-ns = "kube-system"
-}
-
 
 
 generate "main" {
