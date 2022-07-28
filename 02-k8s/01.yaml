@@ -5,7 +5,7 @@ apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
   name: vault-user-creds
-  namespace: cert-manager
+  namespace: srinath-tf-vault-token
 spec:
   provider: vault
   secretObjects:                              # [OPTIONAL] SecretObject defines the desired state of synced K8s secret objects
@@ -19,25 +19,19 @@ spec:
       secretName: linkerd-identity-trust-roots      
       type: kubernetes.io/tls 
   parameters:
-    roleName: 'csi-driver-mesh-role'
+    roleName: 'vault-csi-driver-mesh-role'
     vaultKubernetesMountPath: "sandbox-de-3-v121-blue"
     vaultAddress: 'https://vault-testing.infra.works'
     objects: |
       - objectName: "tls.crt"
-        secretPath: "svc-mesh-info/sandbox-de/certs/root"
+        secretPath: "sandbox-de/certs/trust-anchor"
         secretKey: "crt"
       - objectName: "ca.crt"
-        secretPath: "svc-mesh-info/sandbox-de/certs/root"
+        secretPath: "sandbox-de/certs/trust-anchor"
         secretKey: "ca"        
       - objectName: "tls.key"
-        secretPath: "svc-mesh-info/sandbox-de/certs/root"
+        secretPath: "sandbox-de/certs/trust-anchor"
         secretKey: "key"        
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  namespace: cert-manager
-  name: svcmesh-root-cert-sync-service-sa
 ---
 apiVersion: v1
 kind: Pod

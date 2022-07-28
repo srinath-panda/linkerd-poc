@@ -129,15 +129,7 @@ sri-product \
 
 ```
 
-#### Delete services
-```sh
-helm delete -n srinath-linkerd \
-sri-api-gateway \
-sri-order \
-sri-product \
-sri-auth 
 
-```
 
 ### 2. Test MTLS
 
@@ -156,6 +148,21 @@ prometheus   test              linkerd-viz   srinath-linkerd   √
 
 ### 3.cleanup
 ```sh
+helm delete -n srinath-linkerd \
+sri-api-gateway \
+sri-order \
+sri-product \
+sri-auth 
+
+
+helm delete linkerd-smi -n linkerd
+
+helm delete linkerd2 \
+linkerd-viz 
+
+helm delete cert-manager-trust cert-manager -n cert-manager
+helm delete vault -n vault
+
 k delete secret -n cert-manager linkerd-identity-trust-roots
 k delete secret linkerd-identity-issuer -n linkerd
 ```
