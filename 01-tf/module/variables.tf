@@ -22,7 +22,7 @@ variable k8s_cluster_name {
 }
 
 variable create_vault_token_k8s_namespace {
-  type = bool
+  type    = bool
   default = true
 }
 

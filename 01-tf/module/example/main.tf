@@ -46,6 +46,3 @@ module "test" {
   certificate_color         = "blue"
 }
 
-# output "test" {
-#   value = module.test.test
-# }

@@ -1,0 +1,26 @@
+provider "vault" {
+  address = "${vault.address}"
+  token   = "${vault.token}"
+}
+
+provider "aws" {
+  profile = "${aws.profile}"
+  region  = "${aws.region}"
+}
+
+%{ for name, cluster in metacluster_info.k8s_clusters ~}
+%{ if can(cluster.k8s_host) }
+
+data "aws_eks_cluster_auth" "${name}_cluster_auth" {
+  name = "${name}"
+}
+provider "kubernetes" {
+  host                   = "${cluster.k8s_host}"
+  cluster_ca_certificate = base64decode("${cluster.cluster_ca_certificate}")
+  token                  = data.aws_eks_cluster_auth.${name}_cluster_auth.token
+  alias                  = "${name}"
+}
+%{ endif }
+
+%{~ endfor }
+

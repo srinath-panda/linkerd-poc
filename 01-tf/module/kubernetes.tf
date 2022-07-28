@@ -1,13 +1,13 @@
 resource "kubernetes_namespace" "k8s_namespace_vault_token" {
-    for_each = var.create_vault_token_k8s_namespace ? {0=0} : {}
-    metadata {
-        name = var.vault_token_k8s_namespace
-    }
+  for_each = var.create_vault_token_k8s_namespace ? { 0 = 0 } : {}
+  metadata {
+    name = var.vault_token_k8s_namespace
+  }
 }
 
 resource "kubernetes_service_account" "vault_token_sa" {
   metadata {
-    name = var.vault_token_sa
+    name      = var.vault_token_sa
     namespace = var.vault_token_k8s_namespace
   }
   depends_on = [kubernetes_namespace.k8s_namespace_vault_token]
