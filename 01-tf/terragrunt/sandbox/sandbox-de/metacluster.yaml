@@ -4,11 +4,12 @@ metacluster_tf_data_backend:
   region: "eu-west-1"
   profile: "pd-testing"
 
-# remote_backed_info:
-#   encrypt: "true"
-#   bucket: "srinath-tfstate"
-#   key: "atlantis-test/terraform.tfstate"
+aws:
+  profile: "pd-testing"
+  region: "eu-west-1"
 
 remote_backend_info: 
   bucket: "srinath-tfstate"
   region: "ap-south-1s"
+  encrypt: true
+  profile: "pd-testing"

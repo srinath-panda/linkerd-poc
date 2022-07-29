@@ -18,10 +18,21 @@ locals {
           }
         }
     )
+    remote_backend_info = merge(local.env_vars.remote_backend_info, { key = format("vault_mesh/%v/%v/servicemesh/terraform.tfstate", local.env_name, local.metacluster_name ) })
+
 }
 
 dependency "data" {
   config_path = "${local.metacluster_dir}/data"
+}
+
+remote_state {
+  backend = "s3"
+  generate = {
+    path      = "${get_terragrunt_dir()}/backend.tf"
+    if_exists = "overwrite"
+  }
+  config = local.remote_backend_info
 }
 
 generate "provider" {
