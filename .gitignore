@@ -10,6 +10,7 @@
 
 **/local_vars.tf
 
+/01-tf/terragrunt/**/*.tf
 # .tfstate files
 *.tfstate
 *.tfstate.*
