@@ -36,8 +36,8 @@ resource "vault_kubernetes_auth_backend_config" "k8s_auth_config" {
 resource "vault_kubernetes_auth_backend_role" "k8s_auth_role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-csi-driver-mesh-role"
-  bound_service_account_names      = [var.vault_token_sa]
-  bound_service_account_namespaces = [var.vault_token_k8s_namespace]
+  bound_service_account_names      = var.whitelisted_vault_token_sa
+  bound_service_account_namespaces = var.whitelisted_vault_token_k8s_namespace
   token_ttl                        = 3600
   token_policies                   = [vault_policy.mesh_kv_policy.name]
 }

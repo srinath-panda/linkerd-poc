@@ -37,12 +37,18 @@ provider "kubernetes" {
 }
 
 module "test" {
-  source                    = "../"
-  metacluster_name          = data.terraform_remote_state.metacluster.outputs.metacluster_name
-  k8s_cluster_name          = local.cluster_name
-  vault_token_k8s_namespace = "cert-manager"
-  vault_token_sa            = "svcmesh-trust-anchor-cert-sync-service-sa"
-  k8s_host                  = data.terraform_remote_state.metacluster.outputs.metacluster_eks_cluster_endpoint[local.cluster_name]
-  certificate_color         = "blue"
+  source           = "../"
+  metacluster_name = data.terraform_remote_state.metacluster.outputs.metacluster_name
+  k8s_cluster_name = local.cluster_name
+  delegated_vault_token = {
+    create_bound_service_account_namespace = true
+    service_account_namespace              = "cert-manager"
+    create_bound_service_account_name      = true
+    service_account_name                   = "svcmesh-trust-anchor-cert-sync-service-sa"
+  }
+  whitelisted_vault_token_k8s_namespace = ["cert-manager"]
+  whitelisted_vault_token_sa            = ["svcmesh-trust-anchor-cert-sync-service-sa"]
+  k8s_host                              = data.terraform_remote_state.metacluster.outputs.metacluster_eks_cluster_endpoint[local.cluster_name]
+  certificate_color                     = "blue"
 }
 
