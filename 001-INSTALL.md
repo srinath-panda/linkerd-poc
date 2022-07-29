@@ -44,7 +44,7 @@ helm upgrade -i -n cert-manager cert-manager-trust jetstack/cert-manager-trust -
   - self signed cert and upload as a KV to above path
   - enabled k8s auth, roles and policies for CSI driver to sync this as a tls secret in k8s
 ```sh
-tf -chdir=./01-tf init && tf -chdir=./01-tf plan
+terragrunt run-all apply --terragrunt-no-auto-approve  --terragrunt-working-dir ./01-tf/tf_svc_mesh/sandbox/sandbox-de
 ```
 
 ### 2. K8s preparation

@@ -11,28 +11,6 @@ locals {
   )
 }
 
-
-
-
-generate "provider" {
-  path      = "${get_terragrunt_dir()}/provider.txt"
-  if_exists = "overwrite"
-  contents  = <<EOF
- "${local.metacluster_path}"
- "${local.metacluster_name}"
- "${local.env_name}"
- "${local.env_dir}"
- "${local.metacluster_dir}"
- "${yamlencode(local.env_vars)}"
-
- ${get_terragrunt_dir()}
- ${get_parent_terragrunt_dir()}
-
-}
-EOF
-}
-
-
 generate "data" {
   path      = "${get_terragrunt_dir()}/data.tf"
   if_exists = "overwrite"

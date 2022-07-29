@@ -19,14 +19,11 @@ locals {
     }
   )
   remote_backend_info = merge(local.env_vars.remote_backend_info, { key = format("vault_mesh/%v/%v/servicemesh/terraform.tfstate", local.env_name, local.metacluster_name) })
-
-  mock_outputs = jsondecode(file("${get_parent_terragrunt_dir()}/mock.json"))
-
 }
 
 dependency "data" {
   config_path                             = "${local.metacluster_dir}/data"
-  mock_outputs                            = jsondecode(file("${get_parent_terragrunt_dir()}/mock.json"))
+  mock_outputs                            = jsondecode(file("${get_parent_terragrunt_dir()}/templates/mock.json"))
   mock_outputs_allowed_terraform_commands = ["plan", "validate"]
 }
 
@@ -44,12 +41,12 @@ remote_state {
 generate "providers" {
   path      = "${get_terragrunt_dir()}/provider.tf"
   if_exists = "overwrite"
-  contents  = templatefile("${get_parent_terragrunt_dir()}/provider.tmpl", merge(local.env_vars, { metacluster_info = dependency.data.outputs.metacluster_info }))
+  contents  = templatefile("${get_parent_terragrunt_dir()}/templates/provider.tmpl", merge(local.env_vars, { metacluster_info = dependency.data.outputs.metacluster_info }))
 }
 
 generate "main" {
   path      = "${get_terragrunt_dir()}/main.tf"
   if_exists = "overwrite"
-  contents  = templatefile("${get_parent_terragrunt_dir()}/module.tmpl", merge(local.env_vars, { metacluster_info = dependency.data.outputs.metacluster_info }))
+  contents  = templatefile("${get_parent_terragrunt_dir()}/templates/module.tmpl", merge(local.env_vars, { metacluster_info = dependency.data.outputs.metacluster_info }))
 }
 
