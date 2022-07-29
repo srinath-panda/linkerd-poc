@@ -1,14 +1,14 @@
 
 locals {
-    metacluster_path = "${dirname(path_relative_to_include())}"
-    metacluster_name = "${basename(local.metacluster_path)}"
-    env_name ="${dirname(local.metacluster_path)}"
-    env_dir = "${get_parent_terragrunt_dir()}/${local.env_name}"
-    metacluster_dir = "${local.env_dir}/${local.metacluster_name}"
-    env_vars = merge(
-        yamldecode(file("${local.env_dir}/env.yaml")),
-        yamldecode(file("${local.metacluster_dir}/metacluster.yaml")),
-    )
+  metacluster_path = "${dirname(path_relative_to_include())}"
+  metacluster_name = "${basename(local.metacluster_path)}"
+  env_name         = "${dirname(local.metacluster_path)}"
+  env_dir          = "${get_parent_terragrunt_dir()}/${local.env_name}"
+  metacluster_dir  = "${local.env_dir}/${local.metacluster_name}"
+  env_vars = merge(
+    yamldecode(file("${local.env_dir}/env.yaml")),
+    yamldecode(file("${local.metacluster_dir}/metacluster.yaml")),
+  )
 }
 
 
@@ -17,7 +17,7 @@ locals {
 generate "provider" {
   path      = "${get_terragrunt_dir()}/provider.txt"
   if_exists = "overwrite"
-  contents = <<EOF
+  contents  = <<EOF
  "${local.metacluster_path}"
  "${local.metacluster_name}"
  "${local.env_name}"
@@ -36,7 +36,7 @@ EOF
 generate "data" {
   path      = "${get_terragrunt_dir()}/data.tf"
   if_exists = "overwrite"
-  contents = <<EOF
+  contents  = <<EOF
 data "terraform_remote_state" "metacluster" {
   backend = "s3"
   config  = {
