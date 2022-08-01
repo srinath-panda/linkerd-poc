@@ -1,17 +1,17 @@
-# resource "kubernetes_namespace" "k8s_namespace_linkerd" {
-#   for_each = { 0 = 0 }
-#   metadata {
-# #     annotations = {
-# #       "linkerd.io/inject" = "disabled"
-# #     }
-# #     labels = {
-# #       "linkerd.io/is-control-plane"          = "true"
-# #       "config.linkerd.io/admission-webhooks" = "disabled"
-# #       "linkerd.io/control-plane-ns"          = "linkerd"
-# #     }
-#     name = "linkerd"
-#   }
-# }
+resource "kubernetes_namespace" "k8s_namespace_linkerd" {
+  for_each = { 0 = 0 }
+  metadata {
+    annotations = {
+      "linkerd.io/inject" = "disabled"
+    }
+    labels = {
+      "linkerd.io/is-control-plane"          = "true"
+      "config.linkerd.io/admission-webhooks" = "disabled"
+      "linkerd.io/control-plane-ns"          = "linkerd"
+    }
+    name = "linkerd"
+  }
+}
 
 
 resource "kubernetes_namespace" "k8s_namespace_vault_token" {

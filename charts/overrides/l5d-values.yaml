@@ -17,7 +17,7 @@ proxy:
     cpu:
       request: 100m
     memory:
-      limit: 250Mi
+      limit: 500Mi
       request: 20Mi
 
 # controller configuration
@@ -27,7 +27,7 @@ controllerResources: &controller_resources
     limit: ""
     request: 100m
   memory:
-    limit: 250Mi
+    limit: 500Mi
     request: 50Mi
 destinationResources: *controller_resources
 
@@ -35,7 +35,7 @@ destinationResources: *controller_resources
 identityResources:
   cpu: *controller_resources_cpu
   memory:
-    limit: 250Mi
+    limit: 500Mi
     request: 10Mi
 
 # heartbeat configuration

@@ -9,11 +9,11 @@ spec:
   ca:
     secretName: linkerd-identity-trust-roots
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: linkerd
----
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: linkerd
+# ---
 #intermediate certificate signed by l5d root CA aka (trust-anchor) which is in vault (self signed)
 apiVersion: cert-manager.io/v1
 kind: Certificate
