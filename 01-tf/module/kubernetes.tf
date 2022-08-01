@@ -1,3 +1,19 @@
+# resource "kubernetes_namespace" "k8s_namespace_linkerd" {
+#   for_each = { 0 = 0 }
+#   metadata {
+# #     annotations = {
+# #       "linkerd.io/inject" = "disabled"
+# #     }
+# #     labels = {
+# #       "linkerd.io/is-control-plane"          = "true"
+# #       "config.linkerd.io/admission-webhooks" = "disabled"
+# #       "linkerd.io/control-plane-ns"          = "linkerd"
+# #     }
+#     name = "linkerd"
+#   }
+# }
+
+
 resource "kubernetes_namespace" "k8s_namespace_vault_token" {
   for_each = var.delegated_vault_token.create_bound_service_account_namespace ? { 0 = 0 } : {}
   metadata {
@@ -16,7 +32,7 @@ resource "kubernetes_service_account" "vault_token_sa" {
 
 
 data "kubernetes_service_account" "vault_token_sa" {
-  for_each = var.delegated_vault_token.create_bound_service_account_name ? {} : {0 = 0}
+  for_each = var.delegated_vault_token.create_bound_service_account_name ? {} : { 0 = 0 }
   metadata {
     name      = var.delegated_vault_token.service_account_name
     namespace = var.delegated_vault_token.service_account_namespace
@@ -24,7 +40,7 @@ data "kubernetes_service_account" "vault_token_sa" {
 }
 
 locals {
-  sa_name_secret = var.delegated_vault_token.create_bound_service_account_name ? kubernetes_service_account.vault_token_sa[0].default_secret_name :  data.kubernetes_service_account.vault_token_sa[0].default_secret_name
+  sa_name_secret = var.delegated_vault_token.create_bound_service_account_name ? kubernetes_service_account.vault_token_sa[0].default_secret_name : data.kubernetes_service_account.vault_token_sa[0].default_secret_name
 }
 
 

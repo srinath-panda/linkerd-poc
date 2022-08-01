@@ -4,8 +4,8 @@
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
-  name: vault-user-creds
-  namespace: srinath-tf-vault-token
+  name: linkerd-trust-anchor-certs-scp
+  namespace: cert-manager
 spec:
   provider: vault
   secretObjects:                              # [OPTIONAL] SecretObject defines the desired state of synced K8s secret objects
@@ -24,13 +24,13 @@ spec:
     vaultAddress: 'https://vault-testing.infra.works'
     objects: |
       - objectName: "tls.crt"
-        secretPath: "sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
         secretKey: "crt"
       - objectName: "ca.crt"
-        secretPath: "sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
         secretKey: "ca"        
       - objectName: "tls.key"
-        secretPath: "sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
         secretKey: "key"        
 ---
 apiVersion: v1
@@ -41,7 +41,7 @@ metadata:
     l5d-cert-type: linkerd-trust-anchor-cert-sync-service
   namespace: cert-manager
 spec:
-  serviceAccountName: svcmesh-root-cert-sync-service-sa
+  serviceAccountName: svcmesh-trust-anchor-cert-sync-service-sa
   containers:
   - name: app
     image: nginx
@@ -49,14 +49,14 @@ spec:
       - name: VAULT_ADDR
         value: "https://vault-testing.infra.works"
     volumeMounts:
-      - name: 'vault-user-creds'
+      - name: 'linkerd-trust-anchor-certs-scp'
         mountPath: '/mnt/secrets-store'
         readOnly: true
   volumes:
-    - name: vault-user-creds
+    - name: linkerd-trust-anchor-certs-scp
       csi:
         driver: 'secrets-store.csi.k8s.io'
         readOnly: true
         volumeAttributes:
-          secretProviderClass: 'vault-user-creds'
+          secretProviderClass: 'linkerd-trust-anchor-certs-scp'
 ---

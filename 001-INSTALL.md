@@ -10,34 +10,7 @@ cd /Users/srinathrangaramanujam/Documents/Srinath/deliveryhero/src/dh_projects/m
 
 ```
 
-## A. Install the CSI driver and the Vault
-```sh
-# csi driver
-helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
-helm upgrade --install \
---set syncSecret.enabled=true \
---set enableSecretRotation=true \
-csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver  \
--n kube-system 
-
-# vault csi driver
-# Just installs Vault CSI provider disable vault server and injector
-helm upgrade --install -n vault --create-namespace  \
-  --set "server.enabled=false" \
-  --set "injector.enabled=false" \
-  --set "csi.enabled=true" \
-  --set "global.externalVaultAddr=https://vault-testing.infra.works" \
-  vault ./charts/vault-helm
-
-# cert manager
-helm upgrade -i -n cert-manager cert-manager jetstack/cert-manager --set installCRDs=true --wait --create-namespace
-# cert manager trust
-helm upgrade -i -n cert-manager cert-manager-trust jetstack/cert-manager-trust --wait --create-namespace
-
- ```
-
-## B. Preparation 
-
+## A.Enable Vault k8s auth 
 ### 1. Prepare Vault
   TF creates the following
   - create a kv mount path in vault for storing mesh root CA
@@ -47,13 +20,42 @@ helm upgrade -i -n cert-manager cert-manager-trust jetstack/cert-manager-trust -
 terragrunt run-all apply --terragrunt-no-auto-approve  --terragrunt-working-dir ./01-tf/tf_svc_mesh/sandbox/sandbox-de
 ```
 
-### 2. K8s preparation
+## B. Install the CSI driver and the Vault
+```sh
+# csi driver
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+
+helm upgrade --install \
+--set syncSecret.enabled=true \
+--set enableSecretRotation=true \
+csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver  \
+-n kube-system 
+# vault csi driver
+# Just installs Vault CSI provider disable vault server and injector
+helm upgrade --install -n vault --create-namespace  \
+  --set "server.enabled=false" \
+  --set "injector.enabled=false" \
+  --set "csi.enabled=true" \
+  --set "global.externalVaultAddr=https://vault-testing.infra.works" \
+  vault ./charts/vault-helm
+# cert manager
+helm upgrade -i -n cert-manager cert-manager jetstack/cert-manager --set installCRDs=true --wait --create-namespace
+# cert manager trust
+helm upgrade -i -n cert-manager cert-manager-trust jetstack/cert-manager-trust --wait --create-namespace
+
+ ```
+
+## C. Preparation 
+
+### 1. K8s preparation
   - sync the trust anchor cert (root cert) from vault KV to a k8s secret in linkerd ns
   - Create a new intermediate issue for this k8s cluster.All l5d mtls are signed by this CA
 ```sh
 k apply -f ./02-k8s
 ```
-## C. Install linkerd 
+
+
+## D. Install linkerd 
 
 Things to note here
  -  make sure the A & B steps are done
@@ -62,20 +64,19 @@ Things to note here
     k get secret -n cert-manager linkerd-identity-trust-roots
     k get secret -n linkerd linkerd-identity-issuer
     k get cm -n linkerd linkerd-identity-trust-roots
+
     ```
 
 - install linkerd2
 ```sh
 # install linkerd2 stable
-helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml --wait ./charts/linkerd2
+helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
-k apply -f ./prometheus.yaml ##need to add this is in pd-infra-charts
+helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  linkerd/linkerd2
 
 # install linkerd2 viz
 helm repo add linkerd https://helm.linkerd.io/stable
-
 helm upgrade --install  linkerd-viz -f ./charts/overrides/viz-vaules.yaml  linkerd/linkerd-viz
-
 
 #install linkerd SMI
 # need to delete this crd as it is also shipped in the linkerd2 stable chart and in the SMI chart
@@ -101,7 +102,7 @@ Reasons
     helm delete linkerd2 -n default
     ```
 
-## D. Tasks
+## E. Tasks
 
 ### 1. Deploy the sample services 
 
@@ -146,6 +147,16 @@ prometheus   test              linkerd-viz   srinath-linkerd   √
 ```
 
 
+
+### 4.troubleshoot
+```sh 
+
+export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+curl -s --request POST --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "$VAULT_ROLE"}' $VAULT_ADDR/v1/auth/sandbox-de-3-v121-blue/login 
+
+```
+
+
 ### 3.cleanup
 ```sh
 helm delete -n srinath-linkerd \
@@ -156,13 +167,13 @@ sri-auth
 
 
 helm delete linkerd-smi -n linkerd
-
-helm delete linkerd2 \
-linkerd-viz 
-
+helm delete linkerd2 linkerd-viz 
 helm delete cert-manager-trust cert-manager -n cert-manager
 helm delete vault -n vault
-
+k delete -f ./02-k8s
 k delete secret -n cert-manager linkerd-identity-trust-roots
 k delete secret linkerd-identity-issuer -n linkerd
+terragrunt run-all destroy --terragrunt-no-auto-approve  --terragrunt-working-dir ./01-tf/tf_svc_mesh/sandbox/sandbox-de
+
 ```
+

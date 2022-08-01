@@ -32,11 +32,11 @@ controllerResources: &controller_resources
 destinationResources: *controller_resources
 
 # identity configuration
-identityResources:
-  cpu: *controller_resources_cpu
-  memory:
-    limit: 250Mi
-    request: 10Mi
+# identityResources:
+#   cpu: *controller_resources_cpu
+#   memory:
+#     limit: 250Mi
+#     request: 10Mi
 
 # heartbeat configuration
 heartbeatResources: *controller_resources
