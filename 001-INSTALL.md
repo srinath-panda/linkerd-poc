@@ -70,7 +70,7 @@ Things to note here
 - install linkerd2
 ```sh
 # install linkerd2 stable
-helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
+# helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
 helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  linkerd/linkerd2
 
@@ -152,7 +152,7 @@ prometheus   test              linkerd-viz   srinath-linkerd   √
 ```sh 
 
 export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-curl -s --request POST --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "$VAULT_ROLE"}' $VAULT_ADDR/v1/auth/sandbox-de-3-v121-blue/login 
+curl -s --request POST --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "vault-csi-driver-mesh-role"}' $VAULT_ADDR/v1/auth/sandbox-de-3-v121-blue/login 
 
 ```
 
