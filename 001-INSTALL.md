@@ -72,7 +72,7 @@ Things to note here
 # install linkerd2 stable
 # helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
-helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  linkerd/linkerd2
+helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
 # install linkerd2 viz
 helm repo add linkerd https://helm.linkerd.io/stable
@@ -177,3 +177,13 @@ terragrunt run-all destroy --terragrunt-no-auto-approve  --terragrunt-working-di
 
 ```
 
+
+
+### oauth proxy
+
+```sh
+
+
+helm template -n linkerd-viz linkerd-oauth -f oauth-proxy.yaml ./charts/oauth2-proxy-3.2.5
+
+```

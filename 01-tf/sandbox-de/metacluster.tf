@@ -12,7 +12,7 @@ variable "metacluster_name" {
 }
 
 module "sandbox" {
-  source              = "/Users/srinathrangaramanujam/Documents/Srinath/deliveryhero/src/dh_projects/mesh/linkerd-poc/01-tf/modules/l5d-certs"
+  source              = "../modules/l5d-certs"
   certificate_color   = "blue"
   vault_mount_path    = "${var.kv_svc_mesh_pki_path}/${var.metacluster_name}/certs/trust-anchor"
   mesh_kv_policy_name = "svc-mesh-info-${var.metacluster_name}"

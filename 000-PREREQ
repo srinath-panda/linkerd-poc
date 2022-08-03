@@ -1,0 +1,6 @@
+### 
+1. enable mount path in vault ( pd-vault-aws)
+2. in metacluster add the outputs 
+3. add the prometheus config map to scrape l5d metrics
+4. add the linkerd-viz dns
+5. add the l5d -dd integration

@@ -66,3 +66,14 @@ resource "kubernetes_cluster_role_binding" "vault_auth_delegation" {
     namespace = var.delegated_vault_token.service_account_namespace
   }
 }
+
+resource "kubernetes_labels" "kube_system" {
+  api_version = "v1"
+  kind        = "Namespace"
+  metadata {
+    name = "kube-system"
+  }
+  labels = {
+   "config.linkerd.io/admission-webhooks"=  "disabled"
+  }
+}
