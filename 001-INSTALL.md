@@ -75,7 +75,6 @@ Things to note here
 helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
 # install linkerd2 viz
-helm repo add linkerd https://helm.linkerd.io/stable
 helm upgrade --install  linkerd-viz -f ./charts/overrides/viz-vaules.yaml  linkerd/linkerd-viz
 
 #install linkerd SMI

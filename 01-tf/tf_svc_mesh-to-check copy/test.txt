@@ -1,0 +1,18 @@
+generate "provider" {
+  path      = "${get_terragrunt_dir()}/provider.txt"
+  if_exists = "overwrite"
+  contents = <<EOF
+ "${local.metacluster_rel_path}"
+ "${local.metacluster_name}"
+ "${local.env_name}"
+ "${local.env_dir}"
+ "${local.metacluster_dir}"
+ "${yamlencode(local.env_vars)}"
+
+ ${get_terragrunt_dir()}
+ ${get_parent_terragrunt_dir()}
+
+"${yamlencode(merge(local.env_vars, dependency.data.outputs.metacluster_info))}"
+}
+EOF
+}

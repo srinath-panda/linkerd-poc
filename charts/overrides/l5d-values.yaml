@@ -8,17 +8,11 @@ identity:
 
 installNamespace: false
 
-enablePodAntiAffinity: true
 
 # # proxy configuration
 proxy:
   opaquePorts: "25,587,3306,4444,5432,6379,9300,11211"
-  resources:
-    cpu:
-      request: 100m
-    memory:
-      limit: 500Mi
-      request: 20Mi
 
-controllerReplicas: 3
 webhookFailurePolicy: Fail
+controllerReplicas: 3
+enablePodAntiAffinity: true

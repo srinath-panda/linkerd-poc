@@ -4,3 +4,4 @@
 3. add the prometheus config map to scrape l5d metrics
 4. add the linkerd-viz dns
 5. add the l5d -dd integration
+6. grafana dashboards 

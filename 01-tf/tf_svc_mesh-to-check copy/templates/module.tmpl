@@ -1,0 +1,27 @@
+%{ for name, cluster in metacluster_info.k8s_clusters ~}
+%{ if can(cluster.k8s_host) }
+module "${name}" {
+  source    = "/Users/srinathrangaramanujam/Documents/Srinath/deliveryhero/src/dh_projects/mesh/linkerd-poc/01-tf/module"
+
+  metacluster_name          = "${metacluster_info.metacluster_name}"
+  k8s_cluster_name          = "${name}"
+  k8s_host                  = "${cluster.k8s_host}"
+  certificate_color         = "blue"
+
+  delegated_vault_token = {
+    create_bound_service_account_namespace = "${cluster_specific.create_bound_service_account_namespace}"
+    service_account_namespace              = "${cluster_specific.service_account_namespace}"
+    create_bound_service_account_name      = "${cluster_specific.create_bound_service_account_name}"
+    service_account_name                   = "${cluster_specific.service_account_name}"
+  }
+  whitelisted_vault_token_k8s_namespace = ["cert-manager"]
+  whitelisted_vault_token_sa            = ["svcmesh-trust-anchor-cert-sync-service-sa"]
+
+  
+  providers = {
+    kubernetes = kubernetes.${name}
+  }
+}
+%{ endif }
+
+%{~ endfor }

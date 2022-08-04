@@ -1,0 +1,12 @@
+{
+    "metacluster_info": {
+        "metacluster_name": "sandbox-de",
+        "k8s_clusters": {
+            "sandbox-de-2-v121-blue": {
+                "cluster_ca_certificate": "bW9ja192YWx1ZQo=",
+                "eks_cluster_endpoint": "https://localhost",
+                "k8s_host": "https://localhost"
+            }
+        }
+    }
+}
