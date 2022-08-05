@@ -24,13 +24,13 @@ spec:
     vaultAddress: 'https://vault-testing.infra.works'
     objects: |
       - objectName: "tls.crt"
-        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
         secretKey: "crt"
       - objectName: "ca.crt"
-        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
         secretKey: "ca"        
       - objectName: "tls.key"
-        secretPath: "svc-mesh-info/sandbox-de/certs/trust-anchor"
+        secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
         secretKey: "key"        
 ---
 apiVersion: v1

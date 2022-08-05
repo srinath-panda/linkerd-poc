@@ -1,24 +1,65 @@
 //kubernetes auth 
-resource "vault_auth_backend" "kubernetes" {
-  type = "kubernetes"
-  path = var.k8s_cluster_name
+resource "vault_auth_backend" "vault_auth_k8s_backends" {
+  for_each = var.k8s_auth_backeds
+  type     = "kubernetes"
+  path     = each.key
 }
 
-//configure k8s auth (delegated)
+//create policy for the secret to be accessed  
+resource "vault_policy" "vault_policies" {
+  for_each = var.vault_policies
+  name     = each.key
+  policy   = each.value
+}
+
+//upload secret to vault
+resource "vault_generic_secret" "secrets" {
+  for_each  = var.vault_generic_secrets
+  path      = each.key
+  data_json = each.value
+}
+
+# //configure k8s auth (delegated)
 resource "vault_kubernetes_auth_backend_config" "k8s_auth_config" {
-  backend                = vault_auth_backend.kubernetes.path
-  kubernetes_host        = var.k8s_host
-  kubernetes_ca_cert     = lookup(data.kubernetes_secret.vault_token_sa_secret.data, "ca.crt")
-  token_reviewer_jwt     = lookup(data.kubernetes_secret.vault_token_sa_secret.data, "token")
+  for_each               = var.k8s_auth_backeds
+  backend                = vault_auth_backend.vault_auth_k8s_backends[each.key].path
+  kubernetes_host        = each.value.k8s_host
+  kubernetes_ca_cert     = each.value.k8s_ca_cert
+  token_reviewer_jwt     = each.value.delegated_sa_vault_token
   disable_iss_validation = "true"
 }
 
-//k8s-role
-resource "vault_kubernetes_auth_backend_role" "k8s_auth_role" {
-  backend                          = vault_auth_backend.kubernetes.path
-  role_name                        = "vault-csi-driver-mesh-role"
-  bound_service_account_names      = var.whitelisted_vault_token_sa
-  bound_service_account_namespaces = var.whitelisted_vault_token_k8s_namespace
-  token_ttl                        = 3600
-  token_policies                   = var.policy_names
+
+
+locals {
+  flatten_auth_backed_roles = flatten([for k, v in var.k8s_auth_backeds : [
+    for role_key, role_val in v.roles : {
+      backend_key = k
+      role_key    = role_key
+      role        = role_val
+    }
+  ]])
+
+  auth_bakend_roles = { for x in local.flatten_auth_backed_roles : "${x.backend_key}__${x.role_key}" => {
+    backend_key = x.backend_key
+    role_key    = x.role_key
+    role        = x.role
+    }
+  }
 }
+
+# //k8s-role
+resource "vault_kubernetes_auth_backend_role" "k8s_auth_role" {
+  for_each = local.auth_bakend_roles
+  backend  = vault_auth_backend.vault_auth_k8s_backends[each.value.backend_key].path
+
+  role_name                        = each.value.role_key
+  bound_service_account_names      = each.value.role.bound_service_account_names
+  bound_service_account_namespaces = each.value.role.bound_service_account_namespaces
+  token_ttl                        = 3600
+  token_policies                   = each.value.role.token_policies
+}
+
+
+
+

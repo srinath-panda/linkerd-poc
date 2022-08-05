@@ -9,22 +9,8 @@ variable "cert_info" {
   }))
 }
 
-variable "certificate_color" {
-  type        = string
-  description = "current color of the certificate"
-}
+# variable "certificate_color" {
+#   type        = string
+#   description = "current color of the certificate"
+# }
 
-variable "vault_mount_path" {
-  type        = string
-  description = "vault mount path for service mesh secrets/certs"
-}
-
-variable "mesh_kv_policy_name" {
-  type        = string
-  description = "name of vault policy"
-}
-
-variable "policy_path" {
-  type        = string
-  description = "policy"
-}

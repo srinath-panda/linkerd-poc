@@ -5,11 +5,7 @@ provider "vault" {
 
 
 module "cert_rotate_test" {
-  source              = "../"
-  certificate_color   = "green"
-  vault_mount_path    = "mydata/example/testcerts"
-  policy_path         = "mydata/example/*"
-  mesh_kv_policy_name = "example_policy"
+  source = "../"
   cert_info = {
     "blue" = {
       cert_validity_in_hours = 8760
