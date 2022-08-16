@@ -1,5 +1,0 @@
-tfvars:
-  create_bound_service_account_namespace: true
-  service_account_namespace: "abc"
-  create_bound_service_account_name: true
-  service_account_name: "abc"

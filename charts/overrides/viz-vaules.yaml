@@ -4,3 +4,22 @@ grafana:
   enabled: false
 prometheus:
   enabled: false
+
+enablePodAntiAffinity: true
+
+resources: &ha_resources
+  cpu: &ha_resources_cpu
+    limit: 750m
+    request: 100m
+  memory:
+    limit: 500Mi
+    request: 50Mi
+
+tap:
+  replicas: 3
+  resources: *ha_resources
+
+# web configuration
+dashboard:
+  resources: *ha_resources
+

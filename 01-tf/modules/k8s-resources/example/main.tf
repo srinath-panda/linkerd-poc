@@ -1,7 +1,7 @@
 
 
 provider "kubernetes" {
-  config_path = "/Users/srinathrangaramanujam/Documents/Srinath/deliveryhero/src/pd-box/chapters/infra/k8s-configs/config.sandbox-de-3-v121-blue"
+  config_path = "./src/pd-box/chapters/infra/k8s-configs/config.sandbox-de-3-v121-blue"
 }
 
 module "sample" {

@@ -1,0 +1,14 @@
+# -- Kubernetes DNS Domain name to use
+clusterDomain: cluster.local
+
+# SMI Adaptor configuration
+adaptor:
+  image:
+    # -- Docker registry for the adaptor instance
+    registry: cr.l5d.io/linkerd
+    # -- Docker image name for the adaptor instance
+    name: smi-adaptor
+    # -- Docker image tag for the adaptor instance
+    tag: v0.2.0
+    # -- Pull policy  for the adaptor instance
+    pullPolicy: IfNotPresent

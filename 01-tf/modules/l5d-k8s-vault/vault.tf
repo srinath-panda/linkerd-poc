@@ -5,20 +5,6 @@ resource "vault_auth_backend" "vault_auth_k8s_backends" {
   path     = each.key
 }
 
-//create policy for the secret to be accessed  
-resource "vault_policy" "vault_policies" {
-  for_each = var.vault_policies
-  name     = each.key
-  policy   = each.value
-}
-
-//upload secret to vault
-resource "vault_generic_secret" "secrets" {
-  for_each  = var.vault_generic_secrets
-  path      = each.key
-  data_json = each.value
-}
-
 # //configure k8s auth (delegated)
 resource "vault_kubernetes_auth_backend_config" "k8s_auth_config" {
   for_each               = var.k8s_auth_backeds

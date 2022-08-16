@@ -29,7 +29,7 @@ module "cert_rotate_test" {
 
 output "certs" {
   value     = module.cert_rotate_test.certs
-  sensitive = true
+  sensitive = false
 }
 
 # resource "local_file" "ca" {

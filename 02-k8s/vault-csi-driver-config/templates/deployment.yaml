@@ -1,0 +1,52 @@
+{{- if (hasKey .Values "csiSecretProviderClasses") }}
+{{- $csiInfo := .Values.csiSecretProviderClasses }}
+{{- range $csiKey, $csiVal := $csiInfo.csiSecrets }}
+{{- with $csiVal.syncService }}
+{{- if .enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $csiKey }}-secrets-sync
+  namespace: {{ $csiVal.namespace | default "default" }}
+  labels:
+    name: {{ $csiKey }}-secrets-sync
+    csiSecretProviderClass:  {{ $csiKey }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       name: {{ $csiKey }}-secrets-sync
+       csiSecretProviderClass: {{ $csiKey }}
+  template:
+    metadata:
+      labels:
+       name: {{ $csiKey }}-secrets-sync
+       csiSecretProviderClass: {{ $csiKey }}
+    spec:
+      serviceAccountName: {{ required "service account is required" .serviceAccountName }}
+      containers:
+        - name: {{ $csiKey }}-secrets-sync
+          image: "{{ .image.repository | default "alpine" }}:{{ .image.tag | default 3.16 }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 10m
+              memory: 20m
+            requests:
+              cpu: 10m
+              memory: 20m
+          volumeMounts:
+          - name: 'linkerd-trust-anchor-certs-scp'
+            mountPath: '/mnt/secrets-store'
+            readOnly: true              
+      volumes:
+        - name: linkerd-trust-anchor-certs-scp
+          csi:
+            driver: 'secrets-store.csi.k8s.io'
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ $csiKey | quote}}            
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}

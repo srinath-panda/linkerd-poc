@@ -1,0 +1,15 @@
+{{- if (hasKey .Values "certsInfo") }}
+{{- $apiVersion := .Values.certsInfo.apiVersion  }}
+{{- range $certKey, $certVal := .Values.certsInfo.issuers }}
+apiVersion: {{ default "cert-manager.io/v1" $apiVersion | quote }}
+kind: {{ $certVal.issuerKind  }}
+metadata:
+  name: {{ $certKey }}
+{{- if $certVal.namespace  }}
+  namespace: {{ $certVal.namespace }}
+{{- end }}
+spec:
+{{ toYaml $certVal.issuerSpec | indent 2}}
+---
+{{- end }}
+{{- end }}

@@ -5,7 +5,8 @@
 ```sh
 # create a debug pod
 k run --image nginx debug-l5d -n srinath-linkerd
-k exec -it debug-l5d -n srinath-linkerd -c nginx -- bash
+sleep 10
+k exec -it debug-l5d -n srinath-linkerd -c debug-l5d -- bash
 
 #run the following the insde the pod shell
 # create a new user
@@ -29,17 +30,27 @@ curl --request POST \
 # create product
 curl --request POST \
   --url http://sri-api-gateway:80/product/create \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTAzNDk0MjksImlzcyI6ImdvLWdycGMtYXV0aC1zdmMiLCJJZCI6MSwiRW1haWwiOiJlbG9uQG11c2suY29tIn0.OIYhB80-9N2qYvqm3Vgyz8wo8-p23tb735BRCeOhF8Q' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTE2NTM2MzUsImlzcyI6ImdvLWdycGMtYXV0aC1zdmMiLCJJZCI6MSwiRW1haWwiOiJlbG9uQG11c2suY29tIn0.KG-m2uAv6ZSPioaNJ9IBPHyX6ZmZ4X2zku2IZ8QhUUs' \
   --header 'Content-Type: application/json' \
   --data '{
- "name": "Product B",
+ "name": "Product Z1",
  "stock": 5,
  "price": 15
 }'
 
 #get a product
 curl --request GET \
-  --url http://sri-api-gateway:80/product/3 \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTAzNDgxODYsImlzcyI6ImdvLWdycGMtYXV0aC1zdmMiLCJJZCI6MSwiRW1haWwiOiJlbG9uQG11c2suY29tIn0.tK6HR78duaO15hfzo5-kVMPQNQE0GEmh18bPv8chzW4' 
+  --url http://sri-api-gateway:80/product/10 \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTE2NTM2MzUsImlzcyI6ImdvLWdycGMtYXV0aC1zdmMiLCJJZCI6MSwiRW1haWwiOiJlbG9uQG11c2suY29tIn0.KG-m2uAv6ZSPioaNJ9IBPHyX6ZmZ4X2zku2IZ8QhUUs' 
 
 ```
+
+
+kubectl get pods -A -o jsonpath='{.items[?(@.metadata.annotations.linkerd\.io/inject=="enabled")].metadata.name}'
+
+
+kubectl get deploy -A -o=jsonpath='{.items[?(@.spec.template.metadata.annotations.linkerd\.io/inject=="enabled")].metadata.name}'
+
+
+
+linkerd viz profile -n srinath-linkerd sri-api-gateway --tap deploy/sri-api-gateway --tap-duration 10s

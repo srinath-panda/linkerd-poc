@@ -1,0 +1,27 @@
+
+csiSecretProviderClasses:
+  my-test:
+    csiProvider: vault
+    secrets:
+      enabled: true
+      secretData:
+        linkerd-identity-trust-roots:
+          secretType: Opaque
+          data:
+            "ca.crt" : "ca.crt" 
+            "tls.crt" : "tls.crt" 
+            "tls.key" : "tls.key"
+    providerInfo:
+      roleName: vault-csi-driver-mesh-role
+      vaultKubernetesMountPath: sandbox-de-3-v121-blue 
+      vaultAddress: https://vault-testing.infra.works
+      objects: 
+        - objectName: "tls.crt"
+          secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
+          secretKey: "crt"
+        - objectName: "ca.crt"
+          secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
+          secretKey: "ca"        
+        - objectName: "tls.key"
+          secretPath: "svc-mesh-info/sandbox/certs/trust-anchor"
+          secretKey: "key"        

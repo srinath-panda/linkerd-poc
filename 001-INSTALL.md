@@ -17,7 +17,7 @@ cd /Users/srinathrangaramanujam/Documents/Srinath/deliveryhero/src/dh_projects/m
   - self signed cert and upload as a KV to above path
   - enabled k8s auth, roles and policies for CSI driver to sync this as a tls secret in k8s
 ```sh
-terragrunt run-all apply --terragrunt-no-auto-approve  --terragrunt-working-dir ./01-tf/tf_svc_mesh/sandbox/sandbox-de
+tf -chdir=./01-tf/sandbox init &&  tf -chdir=./01-tf/sandbox apply
 ```
 
 ## B. Install the CSI driver and the Vault
@@ -32,7 +32,7 @@ csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver  \
 -n kube-system 
 # vault csi driver
 # Just installs Vault CSI provider disable vault server and injector
-helm upgrade --install -n vault --create-namespace  \
+helm upgrade --install -n test --create-namespace  \
   --set "server.enabled=false" \
   --set "injector.enabled=false" \
   --set "csi.enabled=true" \
@@ -51,7 +51,10 @@ helm upgrade -i -n cert-manager cert-manager-trust jetstack/cert-manager-trust -
   - sync the trust anchor cert (root cert) from vault KV to a k8s secret in linkerd ns
   - Create a new intermediate issue for this k8s cluster.All l5d mtls are signed by this CA
 ```sh
-k apply -f ./02-k8s
+
+
+helm upgrade --install linkerd-certs ./02-k8s/cert-manager-certs
+helm upgrade --install linkerd-vault ./02-k8s/vault-csi-driver-config
 ```
 
 
@@ -72,7 +75,7 @@ Things to note here
 # install linkerd2 stable
 # helm upgrade --install linkerd2  -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
-helm install linkerd2 -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
+helm upgrade --install linkerd2 -f ./charts/overrides/l5d-values.yaml  ./charts/linkerd2
 
 # install linkerd2 viz
 helm upgrade --install  linkerd-viz -f ./charts/overrides/viz-vaules.yaml  linkerd/linkerd-viz
@@ -82,7 +85,7 @@ helm upgrade --install  linkerd-viz -f ./charts/overrides/viz-vaules.yaml  linke
 k delete crd trafficsplits.split.smi-spec.io
 
 helm repo add l5d-smi https://linkerd.github.io/linkerd-smi
-helm install linkerd-smi l5d-smi/linkerd-smi -n linkerd
+helm install linkerd-smi -n linkerd  ./charts/linkerd-smi
 
 # annotate the Namespace
 k create ns srinath-linkerd
@@ -106,6 +109,9 @@ Reasons
 ### 1. Deploy the sample services 
 
 ```sh
+k create ns srinath-linkerd
+k annotate ns srinath-linkerd linkerd.io/inject=enabled
+
 
 helm upgrade --install \
 -n srinath-linkerd \
@@ -169,11 +175,14 @@ helm delete linkerd-smi -n linkerd
 helm delete linkerd2 linkerd-viz 
 helm delete cert-manager-trust cert-manager -n cert-manager
 helm delete vault -n vault
+helm delete csi-secrets-store -n kube-system 
 k delete -f ./02-k8s
 k delete secret -n cert-manager linkerd-identity-trust-roots
 k delete secret linkerd-identity-issuer -n linkerd
-terragrunt run-all destroy --terragrunt-no-auto-approve  --terragrunt-working-dir ./01-tf/tf_svc_mesh/sandbox/sandbox-de
 
+terraform delete 
+
+tf -chdir=./01-tf/sandbox init &&  tf -chdir=./01-tf/sandbox destroy
 ```
 
 
@@ -186,3 +195,14 @@ terragrunt run-all destroy --terragrunt-no-auto-approve  --terragrunt-working-di
 helm template -n linkerd-viz linkerd-oauth -f oauth-proxy.yaml ./charts/oauth2-proxy-3.2.5
 
 ```
+
+
+- vault-csi:
+    url: https://helm.linkerd.io/stable
+    version: 2.11.4      
+- linkerd-stable:
+    url: https://helm.linkerd.io/stable
+    version: 2.11.4   
+
+
+INFRA-7938

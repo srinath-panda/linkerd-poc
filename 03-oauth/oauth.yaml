@@ -15,7 +15,7 @@ metadata:
     # ingress.kubernetes.io/auth-response-headers: "x-auth-request-user, x-auth-request-email, x-auth-request-preferred-username, authorization"
 spec:
   rules:
-  - host: linkerd-viz-sandbox-de-3-v121-blue.infra.works
+  - host: linkerd-viz-sandbox-de-3-v121-blue.infra.works/
     http:
       paths:
       - path: /

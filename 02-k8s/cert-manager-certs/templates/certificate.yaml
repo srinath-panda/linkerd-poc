@@ -1,0 +1,27 @@
+{{- if (hasKey .Values "certsInfo")}}
+{{- $apiVersion := .Values.certsInfo.apiVersion  }}
+{{- range $certKey, $certVal := .Values.certsInfo.certificates }}
+apiVersion: {{ default "cert-manager.io/v1" $apiVersion | quote }}
+kind: Certificate
+metadata:
+  name: {{ $certKey }}
+  namespace: {{ $certVal.namespace | default "default" }}
+spec:
+  secretName: {{ $certVal.secretName }}
+  duration: {{ $certVal.duration }}
+  renewBefore: {{ $certVal.renewBefore }}
+  issuerRef:
+    name: {{ $certVal.issuerName }}
+    kind: {{ $certVal.issuerKind }}
+  commonName: {{ $certVal.CN }}
+  dnsNames:
+{{ toYaml $certVal.dnsNames | indent 2 }}
+  isCA: {{ $certVal.isCA | default false }}
+  privateKey:
+    algorithm: {{ $certVal.privateKeyAlgo }}
+  usages:
+{{ toYaml $certVal.allowedUsages | indent 2 }}
+
+---
+{{- end }}
+{{- end }}

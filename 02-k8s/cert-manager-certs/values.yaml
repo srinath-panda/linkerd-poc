@@ -1,0 +1,27 @@
+certsInfo:
+  apiVersion: ""
+  issuers:
+    linkerd-trust-anchor-issuer:
+      issuerKind: ClusterIssuer
+      namespace: utils
+      issuerSpec: 
+        ca:
+          secretName: linkerd-identity-trust-roots
+  certificates:
+    linkerd-identity-issuer:
+      namespace: linkerd
+      secretName: linkerd-identity-issuer
+      duration: 2160h # 90d
+      renewBefore: 360h # 15d 
+      issuerName: linkerd-trust-anchor-issuer
+      issuerKind: ClusterIssuer
+      privateKeyAlgo: ECDSA
+      CN: identity.linkerd.cluster.local
+      dnsNames:
+      - identity.linkerd.cluster.local
+      isCA: true
+      allowedUsages:
+      - cert sign
+      - crl sign
+      - server auth
+      - client auth

@@ -1,0 +1,14 @@
+{{- if (hasKey .Values "certsBundlesInfo") }}
+{{- $apiVersion := .Values.certsBundlesInfo.apiVersion  }}
+{{- range $certKey, $certVal := .Values.certsBundlesInfo }}
+apiVersion: {{ default "trust.cert-manager.io/v1alpha1" $apiVersion | quote }}
+kind: Bundle
+metadata:
+  name: {{ $certKey }}
+  labels: 
+    name: {{ $certKey }}
+spec:
+{{ toYaml $certVal | indent 2}}
+---
+{{- end }}
+{{- end }}
